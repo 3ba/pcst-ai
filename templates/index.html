@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCST-AI - Process Control Troubleshooting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+            padding: 0 40px 40px 40px;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .safety-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PCST-AI</h1>
+            <p>Process Control Troubleshooting Assistant</p>
+        </div>
+
+        <div class="search-section">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">Troubleshooting Search</h2>
+            
+            <form id="searchForm">
+                <div class="form-group">
+                    <label for="equipment">Equipment Type</label>
+                    <select id="equipment" name="equipment" required>
+                        <option value="">Select Equipment Type</option>
+                        <option value="Control Valve">Control Valve</option>
+                        <option value="Pressure Gauge">Pressure Gauge</option>
+                        <option value="Displacement Level Transmitter">Displacement Level Transmitter</option>
+                        <option value="Flow Transmitter">Flow Transmitter</option>
+                        <option value="Pressure Transmitter">Pressure Transmitter</option>
+                        <option value="Temperature Transmitter">Temperature Transmitter</option>
+                        <option value="Level Transmitter">Level Transmitter</option>
+                        <option value="Control Panel">Control Panel</option>
+                        <option value="SCADA System">SCADA System</option>
+                        <option value="PLC">PLC</option>
+                        <option value="DCS">DCS</option>
+                        <option value="Safety Instrumented System (SIS)">Safety Instrumented System (SIS)</option>
+                        <option value="Emergency Shutdown System (ESD)">Emergency Shutdown System (ESD)</option>
+                        <option value="Fire and Gas Detection System">Fire and Gas Detection System</option>
+                        <option value="Compressor">Compressor</option>
+                        <option value="Pump">Pump</option>
+                        <option value="Turbine">Turbine</option>
+                        <option value="Heat Exchanger">Heat Exchanger</option>
+                        <option value="Separator">Separator</option>
+                        <option value="Storage Tank">Storage Tank</option>
+                        <option value="Pipeline">Pipeline</option>
+                        <option value="Valve Actuator">Valve Actuator</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="problem">Problem Description</label>
+                    <textarea id="problem" name="problem" placeholder="Describe the issue you're experiencing in detail..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="errorCode">Error Code (optional)</label>
+                    <input type="text" id="errorCode" name="errorCode" placeholder="e.g., E001, ALM-001, etc.">
+                </div>
+
+                <button type="submit" class="search-btn" id="searchBtn">
+                    Search for Solution
+                </button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <h3>Searching for troubleshooting solution...</h3>
+            <p>This may take a few moments as we analyze your request.</p>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">Troubleshooting Results</h2>
+            
+            <div class="result-item">
+                <h3>Problem Analysis</h3>
+                <div id="analysisContent"></div>
+            </div>
+
+            <div class="result-item">
+                <h3>Possible Causes</h3>
+                <div id="causesContent"></div>
+            </div>
+
+            <div class="result-item">
+                <h3>Troubleshooting Steps</h3>
+                <div id="stepsContent"></div>
+            </div>
+
+            <div class="result-item">
+                <h3>Safety Warnings</h3>
+                <div id="safetyContent"></div>
+            </div>
+
+            <div class="result-item">
+                <h3>Equipment Notes</h3>
+                <div id="equipmentNotesContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const searchBtn = document.getElementById('searchBtn');
+            const loading = document.getElementById('loading');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            // Show loading, hide results
+            searchBtn.disabled = true;
+            loading.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData(this);
+            const requestData = {
+                equipment: formData.get('equipment'),
+                problem: formData.get('problem'),
+                error_code: formData.get('errorCode')
+            };
+            
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result.response);
+                } else {
+                    throw new Error(result.error || 'Unknown error occurred');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+            } finally {
+                // Hide loading, enable search button
+                loading.style.display = 'none';
+                searchBtn.disabled = false;
+            }
+        });
+        
+        function displayResults(response) {
+            document.getElementById('analysisContent').innerHTML = `<p>${response.analysis || 'Analysis not available'}</p>`;
+            
+            const causesList = response.causes && response.causes.length > 0 
+                ? response.causes.map(cause => `<li>${cause}</li>`).join('') 
+                : '<li>No causes identified</li>';
+            document.getElementById('causesContent').innerHTML = `<ul>${causesList}</ul>`;
+            
+            const stepsList = response.steps && response.steps.length > 0 
+                ? response.steps.map(step => `<li>${step}</li>`).join('') 
+                : '<li>No steps provided</li>';
+            document.getElementById('stepsContent').innerHTML = `<ol>${stepsList}</ol>`;
+            
+            const safetyList = response.safety_warnings && response.safety_warnings.length > 0 
+                ? response.safety_warnings.map(warning => `<li>${warning}</li>`).join('') 
+                : '<li>Always follow safety protocols</li>';
+            document.getElementById('safetyContent').innerHTML = `<ul class="safety-warning">${safetyList}</ul>`;
+            
+            document.getElementById('equipmentNotesContent').innerHTML = `<p>${response.equipment_notes || 'No specific equipment notes available'}</p>`;
+            
+            // Show results
+            resultsSection.style.display = 'block';
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function showError(message) {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = `
+                <div class="error">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
